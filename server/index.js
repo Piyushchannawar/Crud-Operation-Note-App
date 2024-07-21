@@ -3,6 +3,9 @@ const express = require("express");
 const dotenv = require("dotenv");
 const connectToDb = require('./config/connectToDb.js');
 const notesController = require('./controllers/notesController.js');
+const userController = require('./controllers/userController.js');
+const cookieParser = require('cookie-parser')
+const requireAuth = require('./middleware/requireAuth.js')
 const cors = require('cors');
 
 // Load env Variable
@@ -13,7 +16,11 @@ const app = express();
 
 // Configure express app
 app.use(express.json());
-app.use(cors());
+app.use(cookieParser());
+app.use(cors({
+    origin: true,
+    credentials: true,
+}));
 
 // Connect to database
 connectToDb();
@@ -23,6 +30,11 @@ connectToDb();
 
 
 // Routing
+
+app.post('/signup',userController.signup);
+app.post('/login',userController.login);
+app.get('/logout',userController.logout);
+app.get('/check-auth',requireAuth,  userController.checkAuth)
 
 app.get('/notes',notesController.fetchNotes);
 
